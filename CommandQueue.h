@@ -51,6 +51,12 @@ using namespace std;
 
 namespace DRAMSim
 {
+/** Queue of BusPackets.
+ *
+ * Or really a collection of queues, identified by the two-tuple
+ * <Rank, Bank> (or <Rank,0> for per-Rank queues). The CommandQueue is
+ * responsible for honouring the Four-Activate-Window of each bank.
+ */
 class CommandQueue : public SimulatorObject
 {
 	CommandQueue();

@@ -40,7 +40,7 @@ using namespace std;
 using namespace DRAMSim;
 
 Bank::Bank(ostream &dramsim_log_):
-		currentState(dramsim_log_), 
+		currentState(dramsim_log_),
 		rowEntries(NUM_COLS),
 		dramsim_log(dramsim_log_)
 {}

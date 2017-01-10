@@ -38,7 +38,7 @@
 
 namespace DRAMSim {
 
-
+/** Wrapper around MemorySystem to support multi-channel set-ups. */
 class MultiChannelMemorySystem : public SimulatorObject 
 {
 	public: 

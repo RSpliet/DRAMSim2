@@ -50,6 +50,12 @@ public:
 template <typename Return, typename Param1T, typename Param2T, typename Param3T>
 DRAMSim::CallbackBase<Return,Param1T,Param2T,Param3T>::~CallbackBase() {}
 
+/** Generic for notifying application of completion of events.
+ * These callback objects are defined by the user application and
+ * registered through the MemorySystem. Not used directly, but
+ * made concrete in types like TransactionCompleteCB (used to
+ * notify completion of read and write Transaction).
+ */
 template <typename ConsumerT, typename ReturnT,
 typename Param1T, typename Param2T, typename Param3T >
 class Callback: public CallbackBase<ReturnT,Param1T,Param2T,Param3T>
@@ -80,6 +86,7 @@ private:
 	const PtrMember  member;
 };
 
+/** Explicit Callback type for ``transaction complete'' callbacks */
 typedef CallbackBase <void, unsigned, uint64_t, uint64_t> TransactionCompleteCB;
 } // namespace DRAMSim
 

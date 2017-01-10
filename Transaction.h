@@ -49,6 +49,11 @@ enum TransactionType
 	RETURN_DATA
 };
 
+/** A user-generated memory request
+ *
+ * Transactions are a read or write operation of fixed size
+ * JEDEC_DATA_BUS_BITS * BL .
+ */
 class Transaction
 {
 	Transaction();

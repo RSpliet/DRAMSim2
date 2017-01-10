@@ -28,13 +28,6 @@
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
 
-
-
-
-
-
-
-
 #ifndef BANK_H
 #define BANK_H
 
@@ -51,6 +44,17 @@
 
 namespace DRAMSim
 {
+
+/** Storage space structure for written data
+ *
+ * The bank class is just a glorified sparse storage data structure
+ * that keeps track of written data in case the simulator wants a
+ * function DRAM model
+ * A vector of size NUM_COLS keeps a linked list of rows and their
+ * associated values.
+ *
+ * @todo If anyone wants to actually store data, see the 'data_storage' branch and perhaps try to merge that into master
+ */
 class Bank
 {
 	typedef struct _DataStruct
@@ -63,10 +67,18 @@ class Bank
 public:
 	//functions
 	Bank(ostream &dramsim_log_);
+	/** Search for a node with the right row value.
+	 * If not found returns the tracer value 0xDEADBEEF.
+	 * @param BusPacket Packet containing data and address to read.
+	 */
 	void read(BusPacket *busPacket);
+	/** Add an entry to the proper linked list.
+	 * Replaces the value in a row if it was was already written.
+	 * @param BusPacket Packet containing data and address to write.
+	 */
 	void write(const BusPacket *busPacket);
 
-	//fields
+	/** @todo Unused */
 	BankState currentState;
 
 private:

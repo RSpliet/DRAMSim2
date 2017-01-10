@@ -52,6 +52,15 @@ using namespace std;
 namespace DRAMSim
 {
 class MemorySystem;
+
+/** The front-end of a memory channel
+ * Manages one or more Ranks. Maintains a queue of incoming requests of type
+ * Transaction. On update() a Transaction is translated to a series of BusPacket
+ * objects, which will then be fed to the CommandQueue. MemoryController will
+ * translate the address into a <rank, bank, column, row> tuple by calling
+ * DRAMSim::AddressMapping(). The CommandQueue takes responsibility for
+ * inserting each BusPacket in the right queue.
+ */
 class MemoryController : public SimulatorObject
 {
 

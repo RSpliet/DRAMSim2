@@ -31,6 +31,7 @@
 #define ADDRESS_MAPPING_H
 namespace DRAMSim
 {
+	/** Translate an address into a tuple <chan, rank, bank, row, column>. */
 	void addressMapping(uint64_t physicalAddress, unsigned &channel, unsigned &rank, unsigned &bank, unsigned &row, unsigned &col);
 }
 

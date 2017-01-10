@@ -57,6 +57,10 @@ enum CurrentBankState
 	PowerDown
 };
 
+/** Current state of the bank.
+ * This class keeps track of the current state of a DRAM bank.
+ * All members are public, administration is done externally.
+ */
 class BankState
 {
 	ostream &dramsim_log; 

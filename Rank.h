@@ -46,6 +46,10 @@ using namespace DRAMSim;
 namespace DRAMSim
 {
 class MemoryController; //forward declaration
+
+/** Bank(s) for one DRAM rank.
+ * Responsible for validating timings on each Bank.
+ */
 class Rank : public SimulatorObject
 {
 private:
@@ -69,6 +73,7 @@ public:
 	void powerDown();
 
 	//fields
+	/** Back-reference to memory controller for this rank */
 	MemoryController *memoryController;
 	BusPacket *outgoingDataPacket;
 	unsigned dataCyclesLeft;
@@ -77,7 +82,10 @@ public:
 	//these are vectors so that each element is per-bank
 	vector<BusPacket *> readReturnPacket;
 	vector<unsigned> readReturnCountdown;
+	/** Vector of banks for data storage */
 	vector<Bank> banks;
+	/** Vector of bankStates, one per bank.
+	 * Bank itself has no notion of state */
 	vector<BankState> bankStates;
 
 };

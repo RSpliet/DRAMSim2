@@ -51,6 +51,8 @@ enum BusPacketType
 	DATA
 };
 
+/** JEDEC DRAM command sent from the MemoryController down to individual Bank.
+ */
 class BusPacket
 {
 	BusPacket();
