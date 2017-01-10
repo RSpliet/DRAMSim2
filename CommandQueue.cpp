@@ -716,6 +716,9 @@ void CommandQueue::needRefresh(unsigned rank)
 {
 	refreshWaiting = true;
 	refreshRank = rank;
+
+	if (DEBUG_BANKSTATE)
+		PRINT("* Issuing refresh b[" << rank << "]");
 }
 
 void CommandQueue::nextRankAndBank(unsigned &rank, unsigned &bank)

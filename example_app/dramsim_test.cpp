@@ -27,24 +27,35 @@
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
-
-
-
+int __attribute__((strong)) SHOW_SIM_OUTPUT = true; 
 
 #include <stdio.h>
 #include "dramsim_test.h"
+#include <inttypes.h>
+
+int reads = 0;
+uint64_t last_clk = 0ull;
 
 using namespace DRAMSim;
 
 /* callback functors */
 void some_object::read_complete(unsigned id, uint64_t address, uint64_t clock_cycle)
 {
-	printf("[Callback] read complete: %d 0x%lx cycle=%lu\n", id, address, clock_cycle);
+	printf("[Callback] read complete: %d 0x%lx cycle=%lu (+%"PRIu64")\n", id, address, clock_cycle, clock_cycle - last_clk);
+	reads--;
+	last_clk = clock_cycle;
 }
 
 void some_object::write_complete(unsigned id, uint64_t address, uint64_t clock_cycle)
 {
-	printf("[Callback] write complete: %d 0x%lx cycle=%lu\n", id, address, clock_cycle);
+	printf("[Callback] write complete: %d 0x%lx cycle=%lu (+%"PRIu64")\n", id, address, clock_cycle, clock_cycle - last_clk);
+	last_clk = clock_cycle;
+}
+
+
+void some_object::ref_complete(unsigned id, unsigned rank, uint64_t clock_cycle)
+{
+	printf("[Callback] refresh complete: %d r[%u] cycle=%lu\n", id, rank, clock_cycle);
 }
 
 /* FIXME: this may be broken, currently */
@@ -53,64 +64,39 @@ void power_callback(double a, double b, double c, double d)
 //	printf("power callback: %0.3f, %0.3f, %0.3f, %0.3f\n",a,b,c,d);
 }
 
-int some_object::add_one_and_run(MultiChannelMemorySystem *mem, uint64_t addr)
-{
-
-	/* create a transaction and add it */
-	bool isWrite = false; 
-	mem->addTransaction(isWrite, addr);
-
-	// send a read to channel 1 on the same cycle 
-	addr = 1LL<<33 | addr; 
-	mem->addTransaction(isWrite, addr);
-
-	for (int i=0; i<5; i++)
-	{
-		mem->update();
-	}
-
-	/* add another some time in the future */
-
-	// send a write to channel 0 
-	addr = 0x900012; 
-	isWrite = true; 
-	mem->addTransaction(isWrite, addr);
-	
-
-	/* do a bunch of updates (i.e. clocks) -- at some point the callback will fire */
-	for (int i=0; i<45; i++)
-	{
-		mem->update();
-	}
-
-	/* get a nice summary of this epoch */
-	mem->printStats(true);
-
-	return 0;
-}
-
 int main()
 {
 	some_object obj;
+	int i,j;
 	TransactionCompleteCB *read_cb = new Callback<some_object, void, unsigned, uint64_t, uint64_t>(&obj, &some_object::read_complete);
 	TransactionCompleteCB *write_cb = new Callback<some_object, void, unsigned, uint64_t, uint64_t>(&obj, &some_object::write_complete);
+	RefCompleteCB *ref_cb = new Callback<some_object, void, unsigned, unsigned, uint64_t>(&obj, &some_object::ref_complete);
 
 	/* pick a DRAM part to simulate */
-	MultiChannelMemorySystem *mem = getMemorySystemInstance("ini/DDR2_micron_16M_8b_x8_sg3E.ini", "system.ini", "..", "example_app", 16384); 
-
-
-	mem->RegisterCallbacks(read_cb, write_cb, power_callback);
-	MultiChannelMemorySystem *mem2 = getMemorySystemInstance("ini/DDR2_micron_16M_8b_x8_sg3E.ini", "system.ini", "..", "example_app", 16384); 
-
-	mem2->RegisterCallbacks(read_cb, write_cb, power_callback);
+	MultiChannelMemorySystem *mem = getMemorySystemInstance("ini/DDR3_micron_32M_8B_x4_sg125.ini", "system.ini", "..", "example_app", 2048); 
+	mem->RegisterCallbacks(read_cb, write_cb, power_callback, ref_cb);
 
 	printf("dramsim_test main()\n");
 	printf("-----MEM1------\n");
-	obj.add_one_and_run(mem, 0x100001UL);
-	obj.add_one_and_run(mem, 0x200002UL);
-
-	printf("-----MEM2------\n");
-	obj.add_one_and_run(mem2, 0x300002UL);
+	
+	for (j = 0; j < 30; j++) {
+		for (i = 0; i < 1024; i += 64) {
+			mem->addTransaction(false, 0x800000 + i);
+			mem->addTransaction(true, 0x800400 + i);
+			reads++;
+		}
+		
+		for (i = 0; i < 1024; i += 64) {
+			mem->addTransaction(false, 0x808000 + i);
+			reads++;
+		}
+		
+		while (reads)
+		{
+			mem->update();
+		}
+	}
+	
 	return 0; 
 }
 

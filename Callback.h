@@ -81,6 +81,7 @@ private:
 };
 
 typedef CallbackBase <void, unsigned, uint64_t, uint64_t> TransactionCompleteCB;
+typedef CallbackBase <void, unsigned, unsigned, uint64_t> RefCompleteCB;
 } // namespace DRAMSim
 
 #endif

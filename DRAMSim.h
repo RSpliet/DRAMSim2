@@ -52,10 +52,11 @@ namespace DRAMSim
 			bool willAcceptTransaction(uint64_t addr); 
 			std::ostream &getLogFile();
 
-			void RegisterCallbacks( 
+			void RegisterCallbacks(
 				TransactionCompleteCB *readDone,
 				TransactionCompleteCB *writeDone,
-				void (*reportPower)(double bgpower, double burstpower, double refreshpower, double actprepower));
+				void (*reportPower)(double bgpower, double burstpower, double refreshpower, double actprepower),
+				RefCompleteCB *refDone = NULL);
 			int getIniBool(const std::string &field, bool *val);
 			int getIniUint(const std::string &field, unsigned int *val);
 			int getIniUint64(const std::string &field, uint64_t *val);

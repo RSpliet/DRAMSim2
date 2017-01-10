@@ -465,6 +465,11 @@ void MemoryController::update()
 					bankStates[rank][i].stateChangeCountdown = tRFC;
 				}
 
+				if (parentMemorySystem->RefreshDone!=NULL)
+				{
+					(*parentMemorySystem->RefreshDone)(parentMemorySystem->systemID, rank, currentClockCycle + tRFC);
+				}
+
 				break;
 			default:
 				ERROR("== Error - Popped a command we shouldn't have of type : " << poppedBusPacket->busPacketType);
